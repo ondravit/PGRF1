@@ -24,6 +24,11 @@ public class Panel extends JPanel {
         g.drawImage(raster, 0, 0, null);
     }
 
+    public void clear() {
+        Graphics g = raster.getGraphics();
+        g.clearRect(0, 0, getWidth(), getHeight());
+    }
+
     public BufferedImage getRaster() {
         return raster;
     }
