@@ -1,5 +1,6 @@
 package rasterize;
 
+import controller.Controller2D;
 import model.Line;
 
 import java.awt.image.BufferedImage;
@@ -18,7 +19,6 @@ public class LineRasterizerTrivial extends LineRasterizer {
         int y1 = line.getY1();
         int x2 = line.getX2();
         int y2 = line.getY2();
-
 
         if (Math.abs(y2 - y1) < Math.abs(x2 - x1)) {
             if (x2 < x1) {
