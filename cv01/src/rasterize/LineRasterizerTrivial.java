@@ -1,5 +1,6 @@
 package rasterize;
 
+import controller.Controller2D;
 import model.Line;
 
 import java.awt.image.BufferedImage;
@@ -19,18 +20,40 @@ public class LineRasterizerTrivial extends LineRasterizer {
         int x2 = line.getX2();
         int y2 = line.getY2();
 
-        float k = (y2 - y1) / (float)(x2 - x1);
-        float q = y1 - (k * x1);
+        if (Math.abs(y2 - y1) < Math.abs(x2 - x1)) {
+            if (x2 < x1) {
+                int i = x1;
+                x1 = x2;
+                x2 = i;
+                i = y1;
+                y1 = y2;
+                y2 = i;
+            }
 
-        if (x2 < x1) {
-            int i = x1;
-            x1 = x2;
-            x2 = i;
+            float k = (y2 - y1) / (float)(x2 - x1);
+            float q = y1 - (k * x1);
+
+            for (int x = x1; x <= x2; x++) {
+                float y = (k*x + q);
+                raster.setRGB(x, Math.round(y), color);
+            }
+        } else {
+            if (y2 < y1) {
+                int i = x1;
+                x1 = x2;
+                x2 = i;
+                i = y1;
+                y1 = y2;
+                y2 = i;
+            }
+            float k = (x2 - x1) / (float)(y2 - y1);
+            float q = x1 - (k * y1);
+            for (int y = y1; y <= y2; y++) {
+                float x = (k*y + q);
+                raster.setRGB(Math.round(x), y, color);
+            }
         }
 
-        for (int x = x1; x <= x2; x++) {
-            float y = (k*x + q);
-            raster.setRGB(x, Math.round(y), color);
-        }
+
     }
 }
