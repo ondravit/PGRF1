@@ -46,12 +46,31 @@ public class Controller2D {
                 int x2 = e.getX();
                 int y2 = e.getY();
 
-                // Apply snapping logic if space is pressed
+                // Apply snapping logic if shift is pressed
                 if (snap) {
-                    if (Math.abs(x2 - line.getX1()) > Math.abs(y2 - line.getY1())) {
-                        y2 = line.getY1();  // Snap to horizontal
-                    } else {
-                        x2 = line.getX1();  // Snap to vertical
+                    double deltaX = x2 - line.getX1();
+                    double deltaY = y2 - line.getY1();
+
+                    double slope = deltaY / deltaX;
+                    double minSlope = Math.tan(Math.toRadians(30));
+                    double maxSlope = Math.tan(Math.toRadians(60));
+
+                    //horizontal or vertical
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(slope) < minSlope) {
+                        y2 = line.getY1();
+                    } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(slope) > maxSlope) {
+                        x2 = line.getX1();
+                    }
+                    //diagonal
+                    else if (Math.abs(slope) >= minSlope && Math.abs(slope) <= maxSlope) {
+                        // Normalize the delta values to create a diagonal line
+                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                            // Adjust deltaY to match the proportion of deltaX for diagonal snap
+                            y2 = line.getY1() + (int) (Math.signum(deltaY) * Math.abs(deltaX));
+                        } else {
+                            // Adjust deltaX to match the proportion of deltaY for diagonal snap
+                            x2 = line.getX1() + (int) (Math.signum(deltaX) * Math.abs(deltaY));
+                        }
                     }
                 }
 
@@ -110,14 +129,14 @@ public class Controller2D {
                 }
 
                 //Ctrl snap
-                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                     snap = true;
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                     snap = false;
                 }
             }

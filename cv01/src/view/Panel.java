@@ -34,7 +34,7 @@ public class Panel extends JPanel {
        } else {
             raster.getGraphics().drawString("Hide menu (M)", 5, 20);
             raster.getGraphics().drawString("Press and drag mouse to draw a line", 5, 50);
-            raster.getGraphics().drawString("Press and hold CTRL to snap line to grid", 5, 70);
+            raster.getGraphics().drawString("Press and hold SHIFT to snap line to grid", 5, 70);
             raster.getGraphics().drawString("Use C to clear canvas", 5, 90);
         }
     }
