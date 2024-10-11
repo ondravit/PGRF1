@@ -1,19 +1,26 @@
 package controller;
 
 import model.Line;
+import model.Point;
+import model.Polygon;
 import rasterize.LineRasterizer;
+import rasterize.LineRasterizerGraphics;
 import rasterize.LineRasterizerTrivial;
 import view.Panel;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
 public class Controller2D {
     private final Panel panel;
     private LineRasterizer lineRasterizer;
-    private Line line;
     private ArrayList<Line> lineList = new ArrayList<>();
     private boolean snap = false;
+    private Line line;
+    private Point point;
+    private Polygon polygon;
+
 
     public Controller2D(Panel panel) {
         this.panel = panel;
@@ -32,6 +39,9 @@ public class Controller2D {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                polygon = new Polygon();
+                polygon.addPoint(e.getX(), e.getY());
+
                 line = new Line(e.getX(), e.getY(), e.getX(), e.getY());
                 line.setX1(e.getX());
                 line.setY1(e.getY());

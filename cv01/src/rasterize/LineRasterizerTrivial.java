@@ -4,12 +4,13 @@ import controller.Controller2D;
 import model.Line;
 
 import java.awt.image.BufferedImage;
+import raster.Raster;
 
 public class LineRasterizerTrivial extends LineRasterizer {
-    public LineRasterizerTrivial(BufferedImage raster) {
+    public LineRasterizerTrivial(Raster raster) {
         super(raster);
     }
-    public LineRasterizerTrivial(BufferedImage raster, int color){
+    public LineRasterizerTrivial(Raster raster, int color){
         super(raster, color);
     }
 
@@ -35,7 +36,7 @@ public class LineRasterizerTrivial extends LineRasterizer {
 
             for (int x = x1; x <= x2; x++) {
                 float y = (k*x + q);
-                raster.setRGB(x, Math.round(y), color);
+                raster.setPixel(x, Math.round(y), color);
             }
         } else {
             if (y2 < y1) {
@@ -50,7 +51,7 @@ public class LineRasterizerTrivial extends LineRasterizer {
             float q = x1 - (k * y1);
             for (int y = y1; y <= y2; y++) {
                 float x = (k*y + q);
-                raster.setRGB(Math.round(x), y, color);
+                raster.setPixel(Math.round(x), y, color);
             }
         }
 
