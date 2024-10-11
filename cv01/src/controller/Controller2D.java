@@ -1,6 +1,7 @@
 package controller;
 
 import model.Line;
+import model.Point;
 import rasterize.LineRasterizer;
 import rasterize.LineRasterizerGraphics;
 import rasterize.LineRasterizerTrivial;
@@ -13,6 +14,8 @@ public class Controller2D {
     private final Panel panel;
     private LineRasterizer lineRasterizer;
     Line line;
+    Point point;
+    Polygon polygon;
 
     public Controller2D(Panel panel) {
         this.panel = panel;
@@ -32,6 +35,9 @@ public class Controller2D {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                polygon = new Polygon();
+                polygon.addPoint(e.getX(), e.getY());
+
                 line = new Line(e.getX(), e.getY(), e.getX(), e.getY());
                 line.setX1(e.getX());
                 line.setY1(e.getY());
