@@ -1,12 +1,10 @@
 package view;
 
-import controller.Controller2D;
 import raster.Raster;
 import raster.RasterBufferedImage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class Panel extends JPanel {
 
@@ -21,7 +19,7 @@ public class Panel extends JPanel {
 
     }
 
-    // vykreslí černé pozadí
+    //Background raster
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -33,12 +31,15 @@ public class Panel extends JPanel {
     }
 
     public void startMenu() {
-        if (menu == 0) { ((RasterBufferedImage)raster).getGraphics().drawString("Show menu (M)", 5, 20);
+        if (menu == 0) { ((RasterBufferedImage)raster).getGraphics().drawString("(M) Show menu", 5, 20);
        } else {
-            ((RasterBufferedImage)raster).getGraphics().drawString("Hide menu (M)", 5, 20);
-            ((RasterBufferedImage)raster).getGraphics().drawString("Press and drag mouse to draw a line", 5, 50);
-            ((RasterBufferedImage)raster).getGraphics().drawString("Press and hold SHIFT to snap line to grid", 5, 70);
-            ((RasterBufferedImage)raster).getGraphics().drawString("Use C to clear canvas", 5, 90);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(M) Hide menu", 5, 20);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(C) Clear canvas", 5, 50);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(1) Draw a line (Press and hold SHIFT to snap line to grid)", 5, 70);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(2) Draw a polygon", 5, 90);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(3) Draw a bold line", 5, 110);
+            ((RasterBufferedImage)raster).getGraphics().drawString("Use arrow keys to change width", 5, 130);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(R) Red (G) Green (B) Blue", 5, 150);
         }
     }
 

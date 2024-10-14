@@ -5,7 +5,7 @@ import raster.Raster;
 
 
 public abstract class LineRasterizer {
-    protected final Raster raster;
+    protected Raster raster;
     protected int color;
 
     public LineRasterizer(Raster raster) {
@@ -19,4 +19,8 @@ public abstract class LineRasterizer {
     }
 
     public void drawLine(Line line) {}
+
+    public void setColor(int color) {
+        this.color = color;
+    }
 }

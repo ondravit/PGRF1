@@ -10,21 +10,13 @@ public class PolygonRasterizer {
         this.lineRasterizer = lineRasterizer;
     }
 
-    public PolygonRasterizer() {
-
-    }
 
     public void rasterize(Polygon polygon) {
         if (polygon.size() < 3) {
             return;
         } else {
             for (int i = 0; i < polygon.size(); i++) {
-                if (i != polygon.size() - 1) {
-                    lineRasterizer.drawLine(new Line(polygon.getPoint(i), polygon.getPoint(i + 1)));
-                } else {
-                    lineRasterizer.drawLine(new Line(polygon.getPoint(i), polygon.getPoint(0)));
-                }
-
+                lineRasterizer.drawLine(new Line(polygon.getPoint(i), polygon.getPoint((i + 1)%polygon.size())));
             }
         }
     }

@@ -13,16 +13,16 @@ public class Polygon {
         points.add(point);
     }
 
-    public void addPoint(int x, int y) {
-        points.add(new Point(x, y));
-    }
-
     public Point getPoint(int index) {
         return points.get(index);
     }
 
     public int size() {
         return points.size();
+    }
+
+    public void clear() {
+        points.clear();
     }
 
 

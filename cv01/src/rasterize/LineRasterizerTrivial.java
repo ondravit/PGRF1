@@ -1,17 +1,12 @@
 package rasterize;
 
-import controller.Controller2D;
 import model.Line;
 
-import java.awt.image.BufferedImage;
 import raster.Raster;
 
 public class LineRasterizerTrivial extends LineRasterizer {
     public LineRasterizerTrivial(Raster raster) {
         super(raster);
-    }
-    public LineRasterizerTrivial(Raster raster, int color){
-        super(raster, color);
     }
 
     @Override
@@ -20,6 +15,10 @@ public class LineRasterizerTrivial extends LineRasterizer {
         int y1 = line.getY1();
         int x2 = line.getX2();
         int y2 = line.getY2();
+
+        if (x1 == x2 && y1 == y2) {
+            raster.setPixel(x1, y1, color);
+        }
 
         if (Math.abs(y2 - y1) < Math.abs(x2 - x1)) {
             if (x2 < x1) {
