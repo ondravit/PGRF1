@@ -46,8 +46,10 @@ public class Controller2D {
             @Override
             public void mousePressed(MouseEvent e) {
                 panel.clear();
-                polygon.addPoint(new Point(e.getX(), e.getY()));
-                line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
+                if (mode == 2) {
+                    polygon.addPoint(new Point(e.getX(), e.getY()));
+                    if (polygon.size() <= 3) line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
+                } else line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
                 repaint();
             }
         });
@@ -90,6 +92,8 @@ public class Controller2D {
                         line.setY2(y2);
                         break;
                     case 2:
+                        polygon.setLastPoint(new Point(e.getX(), e.getY()));
+                        polygonRasterizer.rasterize(polygon);
                         break;
                 }
                 lineRasterizer.drawLine(line);
@@ -193,7 +197,8 @@ public class Controller2D {
                 }
 
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    if (lineWidth < 1) lineWidth -= 2;
+                    if (lineWidth > 2) lineWidth -= 2;
+                    panel.clear();
                     repaint();
                 }
             }

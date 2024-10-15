@@ -25,5 +25,9 @@ public class Polygon {
         points.clear();
     }
 
+    public void setLastPoint(Point point) {
+        points.set(points.size() - 1, point);
+    }
+
 
 }
