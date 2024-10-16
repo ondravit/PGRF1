@@ -24,6 +24,9 @@ public class Controller2D {
     private final Polygon polygon = new Polygon();
     int mode = 1;
     int lineWidth = 1;
+    int mouseX = 0;
+    int mouseY = 0;
+    boolean mousePressed = false;
 
     public Controller2D(Panel panel) {
         this.panel = panel;
@@ -45,6 +48,7 @@ public class Controller2D {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                mousePressed = true;
                 panel.clear();
                 if (mode == 2) {
                     polygon.addPoint(new Point(e.getX(), e.getY()));
@@ -58,38 +62,16 @@ public class Controller2D {
             @Override
             public void mouseDragged(MouseEvent e) {
                 panel.clear();
+                mouseX = e.getX();
+                mouseY = e.getY();
 
                 switch (mode){
                     case 1,3:
                         int x2 = e.getX();
                         int y2 = e.getY();
 
-                        //Snap to grid
-                        if (snap) {
-                            double deltaX = x2 - line.getX1();
-                            double deltaY = y2 - line.getY1();
+                        snapToGrid(x2, y2);
 
-                            double slope = deltaY / deltaX;
-                            double minSlope = Math.tan(Math.toRadians(30));
-                            double maxSlope = Math.tan(Math.toRadians(60));
-
-                            //Horizontal or vertical
-                            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(slope) < minSlope) {
-                                y2 = line.getY1();
-                            } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(slope) > maxSlope) {
-                                x2 = line.getX1();
-                            }
-                            //Diagonal
-                            else if (Math.abs(slope) >= minSlope && Math.abs(slope) <= maxSlope) {
-                                if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                                    y2 = line.getY1() + (int) (Math.signum(deltaY) * Math.abs(deltaX));
-                                } else {
-                                    x2 = line.getX1() + (int) (Math.signum(deltaX) * Math.abs(deltaY));
-                                }
-                            }
-                        }
-                        line.setX2(x2);
-                        line.setY2(y2);
                         break;
                     case 2:
                         polygon.setLastPoint(new Point(e.getX(), e.getY()));
@@ -104,7 +86,7 @@ public class Controller2D {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-
+                mousePressed = false;
                 switch (mode){
                     case 1,3:
                         lineList.add(line);
@@ -144,20 +126,29 @@ public class Controller2D {
                 //Ctrl snap
                 if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                     snap = true;
+                    if (mousePressed) {
+                        panel.clear();
+                        snapToGrid(line.getX2(), line.getY2());
+                        lineRasterizer.drawLine(line);
+                        repaint();
+                    }
                 }
 
 
                 //Red color
                 if (e.getKeyCode() == KeyEvent.VK_R) {
                     setColor(0xff0000);
+                    lineRasterizer.drawLine(line);
                 }
                 //Green color
                 if (e.getKeyCode() == KeyEvent.VK_G) {
                     setColor(0x00ff00);
+                    lineRasterizer.drawLine(line);
                 }
                 //Blue color
                 if (e.getKeyCode() == KeyEvent.VK_B) {
                     setColor(0x0000ff);
+                    lineRasterizer.drawLine(line);
                 }
                 //Line mode
                 if (e.getKeyCode() == KeyEvent.VK_1) {
@@ -191,14 +182,20 @@ public class Controller2D {
                     }
                 }
 
+                //increase bold line width
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                     lineWidth += 2;
+                    line.setWidth(lineWidth);
+                    lineRasterizer.drawLine(line);
                     repaint();
                 }
 
+                //decrease bold line width
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                     if (lineWidth > 2) lineWidth -= 2;
                     panel.clear();
+                    line.setWidth(lineWidth);
+                    lineRasterizer.drawLine(line);
                     repaint();
                 }
             }
@@ -207,6 +204,13 @@ public class Controller2D {
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                     snap = false;
+                    if (mousePressed) {
+                        panel.clear();
+                        line.setX2(mouseX);
+                        line.setY2(mouseY);
+                        lineRasterizer.drawLine(line);
+                        repaint();
+                    }
                 }
             }
         });
@@ -219,6 +223,35 @@ public class Controller2D {
         panel.clear();
     }
 
+    private void snapToGrid(int x2, int y2) {
+        //Snap to grid
+        if (snap) {
+            double deltaX = x2 - line.getX1();
+            double deltaY = y2 - line.getY1();
+
+            double slope = deltaY / deltaX;
+            double minSlope = Math.tan(Math.toRadians(30));
+            double maxSlope = Math.tan(Math.toRadians(60));
+
+            //Horizontal or vertical
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(slope) < minSlope) {
+                y2 = line.getY1();
+            } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(slope) > maxSlope) {
+                x2 = line.getX1();
+            }
+            //Diagonal
+            else if (Math.abs(slope) >= minSlope && Math.abs(slope) <= maxSlope) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    y2 = line.getY1() + (int) (Math.signum(deltaY) * Math.abs(deltaX));
+                } else {
+                    x2 = line.getX1() + (int) (Math.signum(deltaX) * Math.abs(deltaY));
+                }
+            }
+        }
+        line.setX2(x2);
+        line.setY2(y2);
+    }
+
     //Set color
     private void setColor(int color) {
         lineRasterizer.setColor(color);
@@ -228,6 +261,7 @@ public class Controller2D {
         repaint();
     }
 
+    //repaint panel
     private void repaint() {
         for (Line line : lineList) {
             line.setWidth(lineWidth);
