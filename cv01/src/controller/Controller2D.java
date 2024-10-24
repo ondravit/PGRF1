@@ -1,5 +1,6 @@
 package controller;
 
+import fill.SeedFiller;
 import model.Line;
 import model.Point;
 import model.Polygon;
@@ -48,55 +49,68 @@ public class Controller2D {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                mousePressed = true;
-                panel.clear();
-                if (mode == 2) {
-                    polygon.addPoint(new Point(e.getX(), e.getY()));
-                    if (polygon.size() <= 3) line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
-                } else line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
-                repaint();
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    mousePressed = true;
+                    panel.clear();
+                    if (mode == 2) {
+                        polygon.addPoint(new Point(e.getX(), e.getY()));
+                        if (polygon.size() <= 3) line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
+                    } else line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
+                    repaint();
+                }
+                if (mode == 2 && e.getButton() == MouseEvent.BUTTON3) {
+                    SeedFiller seedFiller = new SeedFiller(e.getX(), e.getY(), lineRasterizer.getColor(), panel.getRaster());
+                    seedFiller.seedFill(e.getX(), e.getY());
+                    repaint();
+                }
+
             }
         });
 
         panel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                panel.clear();
-                mouseX = e.getX();
-                mouseY = e.getY();
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    panel.clear();
+                    mouseX = e.getX();
+                    mouseY = e.getY();
 
-                switch (mode){
-                    case 1,3:
-                        int x2 = e.getX();
-                        int y2 = e.getY();
+                    switch (mode){
+                        case 1,3:
+                            int x2 = e.getX();
+                            int y2 = e.getY();
 
-                        snapToGrid(x2, y2);
+                            snapToGrid(x2, y2);
 
-                        break;
-                    case 2:
-                        polygon.setLastPoint(new Point(e.getX(), e.getY()));
-                        polygonRasterizer.rasterize(polygon);
-                        break;
+                            break;
+                        case 2:
+                            polygon.setLastPoint(new Point(e.getX(), e.getY()));
+                            polygonRasterizer.rasterize(polygon);
+                            break;
+                    }
+                    lineRasterizer.drawLine(line);
+                    repaint();
                 }
-                lineRasterizer.drawLine(line);
-                repaint();
+
             }
         });
 
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                mousePressed = false;
-                switch (mode){
-                    case 1,3:
-                        lineList.add(line);
-                        break;
-                    case 2:
-                        lineList.add(line);
-                        polygonRasterizer.rasterize(polygon);
-                        break;
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    mousePressed = false;
+                    switch (mode){
+                        case 1,3:
+                            lineList.add(line);
+                            break;
+                        case 2:
+                            lineList.add(line);
+                            polygonRasterizer.rasterize(polygon);
+                            break;
+                    }
+                    repaint();
                 }
-                repaint();
             }
         });
 
