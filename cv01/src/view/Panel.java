@@ -39,8 +39,10 @@ public class Panel extends JPanel {
             ((RasterBufferedImage)raster).getGraphics().drawString("(2) Draw a polygon", 5, 90);
             ((RasterBufferedImage)raster).getGraphics().drawString("(3) Draw a bold line", 5, 110);
             ((RasterBufferedImage)raster).getGraphics().drawString("Use arrow keys to change width", 5, 130);
-            ((RasterBufferedImage)raster).getGraphics().drawString("(R) Red (G) Green (B) Blue", 5, 150);
-            ((RasterBufferedImage)raster).getGraphics().drawString("Right click to fill polygon", 5, 170);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(4) Draw a pentagon", 5, 150);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(R) Red (G) Green (B) Blue", 5, 170);
+            ((RasterBufferedImage)raster).getGraphics().drawString("Right click to fill polygon", 5, 190);
+            ((RasterBufferedImage)raster).getGraphics().drawString("(F) fill/un fill polygon", 5, 210);
         }
     }
 

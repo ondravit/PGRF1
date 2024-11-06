@@ -1,5 +1,6 @@
 package controller;
 
+import fill.ScanLine;
 import fill.SeedFiller;
 import model.Line;
 import model.Point;
@@ -19,15 +20,17 @@ public class Controller2D {
     private final LineRasterizer lineRasterizer1;
     private final LineRasterizer lineRasterizer2;
     private final PolygonRasterizer polygonRasterizer;
+    private final ScanLine scanLine;
     private final ArrayList<Line> lineList = new ArrayList<>();
     private boolean snap = false;
     private Line line;
-    private final Polygon polygon = new Polygon();
+    private Polygon polygon = new Polygon();
     int mode = 1;
     int lineWidth = 1;
     int mouseX = 0;
     int mouseY = 0;
     boolean mousePressed = false;
+    boolean filledPolygon = false;
 
     public Controller2D(Panel panel) {
         this.panel = panel;
@@ -39,6 +42,7 @@ public class Controller2D {
         polygonRasterizer = new PolygonRasterizer(lineRasterizer1);
 
         lineRasterizer = lineRasterizer1;
+        scanLine = new ScanLine(panel.getRaster());
 
         initListeners();
         panel.repaint();
@@ -54,11 +58,22 @@ public class Controller2D {
                     panel.clear();
                     if (mode == 2) {
                         polygon.addPoint(new Point(e.getX(), e.getY()));
-                        if (polygon.size() <= 3) line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
-                    } else line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
+                        if (polygon.size() <= 3){
+                            line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
+                            fillPolygon();
+                        }
+
+                    } else if (mode == 4) {
+                        clear();
+                        polygon = new Polygon(new Point(e.getX(), e.getY()));
+                    } else {
+                        line = new Line(e.getX(), e.getY(), e.getX(), e.getY(), lineWidth);
+                    }
                     repaint();
                 }
-                if (mode == 2 && e.getButton() == MouseEvent.BUTTON3) {
+
+                //Fill polygon when right click
+                if ((mode == 2 || mode == 4) && e.getButton() == MouseEvent.BUTTON3) {
                     SeedFiller seedFiller = new SeedFiller(e.getX(), e.getY(), lineRasterizer.getColor(), panel.getRaster());
                     seedFiller.seedFill(e.getX(), e.getY());
                     repaint();
@@ -76,19 +91,28 @@ public class Controller2D {
                     mouseY = e.getY();
 
                     switch (mode){
-                        case 1,3:
+                        case 1,3: //line or bold line
                             int x2 = e.getX();
                             int y2 = e.getY();
 
                             snapToGrid(x2, y2);
 
+                            lineRasterizer.drawLine(line);
                             break;
-                        case 2:
-                            polygon.setLastPoint(new Point(e.getX(), e.getY()));
+                        case 2: //polygon
+                            polygon.setLastPoint(new Point(mouseX, mouseY));
                             polygonRasterizer.rasterize(polygon);
+                            lineRasterizer.drawLine(line);
+                            fillPolygon();
+                            break;
+                        case 4: //pentagon
+                            clear();
+                            polygon.setPentagon(new Point(mouseX, mouseY));
+                            polygonRasterizer.rasterize(polygon);
+                            fillPolygon();
                             break;
                     }
-                    lineRasterizer.drawLine(line);
+
                     repaint();
                 }
 
@@ -107,6 +131,10 @@ public class Controller2D {
                         case 2:
                             lineList.add(line);
                             polygonRasterizer.rasterize(polygon);
+                            fillPolygon();
+                            break;
+                        case 4:
+                            fillPolygon();
                             break;
                     }
                     repaint();
@@ -153,16 +181,19 @@ public class Controller2D {
                 if (e.getKeyCode() == KeyEvent.VK_R) {
                     setColor(0xff0000);
                     lineRasterizer.drawLine(line);
+                    fillPolygon();
                 }
                 //Green color
                 if (e.getKeyCode() == KeyEvent.VK_G) {
                     setColor(0x00ff00);
                     lineRasterizer.drawLine(line);
+                    fillPolygon();
                 }
                 //Blue color
                 if (e.getKeyCode() == KeyEvent.VK_B) {
                     setColor(0x0000ff);
                     lineRasterizer.drawLine(line);
+                    fillPolygon();
                 }
                 //Line mode
                 if (e.getKeyCode() == KeyEvent.VK_1) {
@@ -170,6 +201,20 @@ public class Controller2D {
                         clear();
                         lineRasterizer = lineRasterizer1;
                         mode = 1;
+                        repaint();
+                    }
+                }
+
+                //Fill polygon mode
+                if (e.getKeyCode() == KeyEvent.VK_F) {
+                    if ((mode == 2 || mode == 4) && !filledPolygon) {
+                        filledPolygon = true;
+                        scanLine.fillPolygon(polygon);
+                        repaint();
+                    } else if ((mode == 2 || mode == 4) && filledPolygon) {
+                        filledPolygon = false;
+                        panel.clear();
+                        polygonRasterizer.rasterize(polygon);
                         repaint();
                     }
                 }
@@ -185,6 +230,7 @@ public class Controller2D {
                     }
                 }
 
+
                 //Bold mode
                 if (e.getKeyCode() == KeyEvent.VK_3) {
                     if (mode != 3) {
@@ -192,6 +238,17 @@ public class Controller2D {
                         lineRasterizer = lineRasterizer2;
                         lineWidth = 6;
                         mode = 3;
+                        repaint();
+                    }
+                }
+
+                //Pentagon mode
+                if (e.getKeyCode() == KeyEvent.VK_4) {
+                    if (mode != 4) {
+                        clear();
+                        lineRasterizer = lineRasterizer1;
+                        polygonRasterizer.setLineRasterizer(lineRasterizer1);
+                        mode = 4;
                         repaint();
                     }
                 }
@@ -230,11 +287,8 @@ public class Controller2D {
         });
     }
 
-    //Clear everything
-    private void clear() {
-        polygon.clear();
-        lineList.clear();
-        panel.clear();
+    private void fillPolygon() {
+        if (filledPolygon) scanLine.fillPolygon(polygon);
     }
 
     private void snapToGrid(int x2, int y2) {
@@ -273,6 +327,13 @@ public class Controller2D {
         lineRasterizer2.setColor(color);
         if (mode == 2) polygonRasterizer.rasterize(polygon);
         repaint();
+    }
+
+    //Clear everything
+    private void clear() {
+        polygon.clear();
+        lineList.clear();
+        panel.clear();
     }
 
     //repaint panel
